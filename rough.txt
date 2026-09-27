@@ -1,0 +1,25 @@
+
+C++ http server from scratch
+
+
+Understanding the fundamentals
+1. Socket: gives programs access to the network
+Steps to create a socket:
+- Create a socket
+- Bind an address to a socket.
+- Listen for incoming connection on server
+- Send and recieve messages
+- Close server
+
+2. Server.
+infinite loop
+accept, handle, respond
+
+Major Learnings:
+importance of header files
+virtual functions
+
+
+Mistakes:
+calling virtual function in constructor.
+not keeping proper track of datatypes of arguments being passed.
