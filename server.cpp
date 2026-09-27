@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <thread>
-
+#include <chrono>
 using namespace std;
 
 
@@ -62,6 +62,11 @@ TestServer::TestServer(
 }
 
 void TestServer::handleClient(int client_socket) {
+    cout << "Handling client on socket: "
+         << client_socket
+         << endl;
+    
+    this_thread::sleep_for(chrono::seconds(5)); // Simulate some processing time
     char buffer[30000] = {0};
 
     ssize_t bytes_read = read(

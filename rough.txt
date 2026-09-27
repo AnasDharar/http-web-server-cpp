@@ -18,6 +18,7 @@ accept, handle, respond
 Major Learnings:
 importance of header files
 virtual functions
+this project has more new stuff related to cpp and networking/os rather than testing core problem solving. 
 
 
 Mistakes:
