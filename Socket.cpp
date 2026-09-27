@@ -65,7 +65,17 @@ BindingSocket::BindingSocket(
     : Socket(domain, type, protocol, port, interface)
 {
     struct sockaddr_in address = getAddress();
+    int opt = 1;
 
+    if (setsockopt(
+        getSocket(),
+        SOL_SOCKET,
+        SO_REUSEADDR,
+        &opt,
+        sizeof(opt)
+    ) < 0) {
+        cerr << "Error setting SO_REUSEADDR" << endl;
+    }
     if (bind(
         getSocket(),
         (struct sockaddr*)&address,

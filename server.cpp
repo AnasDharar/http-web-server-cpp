@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <cstring>
+#include <thread>
 
 using namespace std;
 
@@ -60,65 +61,27 @@ TestServer::TestServer(
     run();
 }
 
-
-void TestServer::accepter() {
-
-    cout << "Accepting connections..." << endl;
-
-    struct sockaddr_in address =
-        getListeningSocket()->getAddress();
-
-    socklen_t address_length = sizeof(address);
-
-    new_socket = accept(
-        getListeningSocket()->getSocket(),
-        (struct sockaddr*)&address,
-        &address_length
-    );
-
-    if (new_socket < 0) {
-        cerr << "Error accepting connection" << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    cout << "Connection accepted on socket: "
-         << new_socket
-         << endl;
-
-
-    // Clear buffer before reading
-    memset(buffer, 0, sizeof(buffer));
+void TestServer::handleClient(int client_socket) {
+    char buffer[30000] = {0};
 
     ssize_t bytes_read = read(
-        new_socket,
+        client_socket,
         buffer,
         sizeof(buffer) - 1
     );
 
     if (bytes_read < 0) {
         cerr << "Error reading from socket" << endl;
-        close(new_socket);
+        close(client_socket);
         return;
     }
 
     buffer[bytes_read] = '\0';
-}
-
-
-void TestServer::handler() {
-
-    cout << "Handling requests..." << endl;
 
     cout << "Received data:" << endl;
     cout << "------------------------" << endl;
     cout << buffer;
     cout << "------------------------" << endl;
-}
-
-
-void TestServer::responder() {
-
-    cout << "Sending response..." << endl;
 
     const char* response =
         "HTTP/1.1 200 OK\r\n"
@@ -128,7 +91,7 @@ void TestServer::responder() {
         "Hello world!";
 
     ssize_t bytes_sent = send(
-        new_socket,
+        client_socket,
         response,
         strlen(response),
         0
@@ -141,15 +104,37 @@ void TestServer::responder() {
         cout << "Response sent." << endl;
     }
 
-    close(new_socket);
+    close(client_socket);
 }
-
 
 void TestServer::run() {
 
     while (true) {
-        accepter();
-        handler();
-        responder();
+
+        //Accepter logic directly in the run method
+        cout << "Accepting connections..." << endl;
+
+    struct sockaddr_in address =
+        getListeningSocket()->getAddress();
+
+    socklen_t address_length = sizeof(address);
+
+    int new_socket = accept(
+        getListeningSocket()->getSocket(),
+        (struct sockaddr*)&address,
+        &address_length
+    );
+
+    if (new_socket < 0) {
+        cerr << "Error accepting connection" << endl;
+        continue;
+    }
+
+    cout << "Connection accepted on socket: "
+         << new_socket
+         << endl;
+        //One thread per client connection
+        std::thread t(&TestServer::handleClient, this, new_socket);
+        t.detach();
     }
 }

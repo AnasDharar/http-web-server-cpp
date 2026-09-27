@@ -11,10 +11,6 @@ class SimpleServer {
 private:
     ListeningSocket* listeningSocket;
 
-    virtual void accepter() = 0;
-    virtual void handler() = 0;
-    virtual void responder() = 0;
-
 public:
     SimpleServer(
         int domain,
@@ -35,8 +31,9 @@ public:
 
 class TestServer : public SimpleServer {
 private:
-    char buffer[30000] = {0};
-    int new_socket;
+    // char buffer[30000] = {0};
+    // int new_socket;
+    void handleClient(int client_socket);
 
 public:
     TestServer(
@@ -47,10 +44,6 @@ public:
         unsigned long interface,
         int backlog
     );
-
-    void accepter() override;
-    void handler() override;
-    void responder() override;
     void run() override;
 };
 
